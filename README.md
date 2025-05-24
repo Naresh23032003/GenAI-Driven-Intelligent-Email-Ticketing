@@ -14,8 +14,8 @@ Click the image above to watch the full demonstration on YouTube.
 - Sentiment Analysis: Identify negative emails using rule-based detection.
 - Complaint Classification: Map issues to a predefined issue dictionary.
 - Team Assignment: Route tickets to the correct operational team.
-- Streamlit Dashboard: View tickets by team, date, and sentiment.
-- Lightweight Backend: Local SQLite database for quick and easy deployment.
+- Dashboard: View tickets by team, date, and sentiment.
+- Lightweight Backend: Local database for quick and easy deployment.
 
 ---
 
@@ -27,8 +27,8 @@ Click the image above to watch the full demonstration on YouTube.
 ## Repository Structure
 ```
 📦 GenAI-Driven-Intelligent-Email-Ticketing
-├── app.py              # Streamlit dashboard for ticket view & team analytics
-├── db.py               # SQLite backend for storing ticket metadata
+├── app.py              # Dashboard for ticket view & team analytics
+├── db.py               # Backend for storing ticket metadata
 ├── email_processor.py  # Core logic: parsing, sentiment, and classification
 ├── sample_data/        # Sample dataset with 500 emails
 ├── demo_video.mp4      # Video demonstration of the system (20 MB)
