@@ -11,8 +11,8 @@ from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
 # Email credentials and server settings
-EMAIL_ACCOUNT = "geet6216@gmail.com"
-EMAIL_PASSWORD = "fbqp quyj arfv opxr" 
+EMAIL_ACCOUNT = "example@gmail.com"    # Replace with your email id
+EMAIL_PASSWORD = "password"            # Replace with your password
 IMAP_SERVER = "imap.gmail.com"
 
 # Provided issue dictionary
