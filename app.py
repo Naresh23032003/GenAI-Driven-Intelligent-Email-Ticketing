@@ -10,8 +10,8 @@ import plotly.express as px
 # ------------------------
 # Configs
 # ------------------------
-EMAIL_ACCOUNT = "geet6216@gmail.com"
-EMAIL_PASSWORD = "fbqp quyj arfv opxr" 
+EMAIL_ACCOUNT = "example@gmail.com"  # Replace with your email id
+EMAIL_PASSWORD = "password"          # Replace with your password
 DB_PATH = "tickets.db"
 
 # Updated customer issues dictionary (only used for sidebar navigation)
