@@ -142,9 +142,9 @@ def classify_email(subject, body):
     sentiment_result = chain_sentiment.invoke({"subject": subject, "body": body})
     sentiment = sentiment_result.strip().lower()
     print("Sentiment result:", sentiment)
-    if sentiment == "positive":
+    if sentiment.startswith("positive"):
         # Positive emails (e.g. appreciation) require no further action.
-        return "Positive", "No action required","No action required"
+        return "Positive", "No action required", "No action required"
     else:
         # Step 2: Classify issue for negative emails
         result = chain_issue.invoke({"subject": subject, "body": body})
@@ -160,7 +160,7 @@ def classify_email(subject, body):
                 )
             except Exception as e:
                 print("JSON parsing error:", e)
-        return "Uncategorized", "Could not classify"
+        return "Negative", "Uncategorized", "Could not classify"
 
 # Function to extract email content from an IMAP message
 def extract_email_content(msg):
