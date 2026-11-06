@@ -1,4 +1,7 @@
 # GenAI-Driven Intelligent Email Ticketing
+
+[![CI](https://github.com/Naresh23032003/GenAI-Driven-Intelligent-Email-Ticketing/actions/workflows/ci.yml/badge.svg)](https://github.com/Naresh23032003/GenAI-Driven-Intelligent-Email-Ticketing/actions/workflows/ci.yml)
+
 This repository contains the source code for an intelligent email processing system that automates complaint classification and triage. Designed for service-oriented industries such as logistics and customer support, the system leverages Natural Language Processing (NLP) techniques, a lightweight architecture, and integration with Ollama's LLAMA 3 model to enhance operational efficiency.
 
 ## Live Demo
