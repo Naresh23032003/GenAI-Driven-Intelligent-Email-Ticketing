@@ -4,3 +4,5 @@ numpy==1.24.3
 scikit-learn==1.2.2
 nltk==3.8.1
 SQLAlchemy==2.0.21
+langchain-ollama
+langchain-core
