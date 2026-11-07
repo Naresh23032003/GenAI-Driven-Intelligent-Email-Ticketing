@@ -55,6 +55,19 @@ cd Naresh23032003/GenAI-Driven-Intelligent-Email-Ticketing
 pip install -r requirements.txt
 ```
 
+### Configuration
+Configure the system by setting the following environment variables (see `.env.example`):
+- `EMAIL_ACCOUNT`: Email address used for sending replies and checking incoming mail (default: empty string)
+- `EMAIL_PASSWORD`: Password or App Password for the email account (default: empty string)
+- `IMAP_SERVER`: IMAP server for reading incoming emails (default: `imap.gmail.com`)
+- `DB_PATH`: Path to SQLite database file (default: `tickets.db`)
+- `OLLAMA_MODEL`: Model name used with Ollama (default: `llama3.1`)
+
+Initialize the database:
+```bash
+python db.py
+```
+
 ### Run the App
 ```bash
 streamlit run app.py
