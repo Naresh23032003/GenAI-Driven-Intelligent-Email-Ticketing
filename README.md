@@ -8,6 +8,16 @@ Click the image above to watch the full demonstration on YouTube.
 
 ---
 
+## Demo
+To explore the dashboard without configuring Gmail credentials or running Ollama, seed a demo database with fake tickets:
+
+```bash
+python scripts/seed_demo.py --db /tmp/demo.db
+sqlite3 /tmp/demo.db "select count(*), sum(status='open') from tickets"
+```
+
+---
+
 ## Key Features
 
 - Automated Email Parsing: Extract sender, subject, body, and timestamp.
