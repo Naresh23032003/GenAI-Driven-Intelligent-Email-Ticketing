@@ -10,14 +10,10 @@ from datetime import datetime
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
-import os
-
 # Email credentials and server settings
-EMAIL_ACCOUNT = os.environ.get("EMAIL_ACCOUNT", "")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
-IMAP_SERVER = os.environ.get("IMAP_SERVER", "imap.gmail.com")
-DB_PATH = os.environ.get("DB_PATH", "tickets.db")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1")
+EMAIL_ACCOUNT = "example@gmail.com"    # Replace with your email id
+EMAIL_PASSWORD = "password"            # Replace with your password
+IMAP_SERVER = "imap.gmail.com"
 
 # Provided issue dictionary
 issue_dictionary = """
@@ -103,7 +99,7 @@ escaped_issue_dictionary = issue_dictionary.replace("{", "{{").replace("}", "}}"
 
 # Build the issue classification prompt template
 template_issue = (
-    "You are a helpful assistant at a logistics company. Your task is to classify the following customer email into one of the issue categories and specific issues listed below.\n\n"
+    "You are a helpful assistant at FedEx. Your task is to classify the following customer email into one of the issue categories and specific issues listed below.\n\n"
     "Use the following issue dictionary:\n"
     + escaped_issue_dictionary +
     "\n\n"
@@ -116,7 +112,7 @@ template_issue = (
 
 # Build the sentiment analysis prompt template
 template_sentiment = (
-    "You are a helpful assistant at a logistics company. Your task is to determine if the following customer email is positive (e.g. an appreciation or compliment email) or negative (a complaint that requires attention).\n\n"
+    "You are a helpful assistant at FedEx. Your task is to determine if the following customer email is positive (e.g. an appreciation or compliment email) or negative (a complaint that requires attention).\n\n"
     "Return only one word: either 'positive' or 'negative'.\n\n"
     "Email Subject: {subject}\n"
     "Email Body: {body}\n\n"
@@ -124,7 +120,7 @@ template_sentiment = (
 )
 
 # Initialize the LLM model
-model = OllamaLLM(model=OLLAMA_MODEL)
+model = OllamaLLM(model="llama3.1")
 
 # Create prompt chains for sentiment analysis and issue classification
 prompt_sentiment = ChatPromptTemplate.from_template(template_sentiment)
@@ -193,7 +189,7 @@ def extract_email_content(msg):
 # Function to process a single email and store it in the SQLite database
 def process_email(from_, subject, body):
     senti, issue_category, specific_issue = classify_email(subject, body)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect("tickets.db")
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO tickets (timestamp, sender, subject, body, sentiment, issue_category, specific_issue)

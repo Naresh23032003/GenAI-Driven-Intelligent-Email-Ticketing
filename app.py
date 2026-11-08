@@ -9,11 +9,9 @@ import plotly.express as px
 # ------------------------
 # Configs
 # ------------------------
-import os
-
-EMAIL_ACCOUNT = os.environ.get("EMAIL_ACCOUNT", "")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
-DB_PATH = os.environ.get("DB_PATH", "tickets.db")
+EMAIL_ACCOUNT = "example@gmail.com"  # Replace with your email id
+EMAIL_PASSWORD = "password"          # Replace with your password
+DB_PATH = "tickets.db"
 
 # Updated customer issues dictionary (only used for sidebar navigation)
 customer_issues = {
