@@ -1,105 +1,117 @@
 # GenAI-Driven Intelligent Email Ticketing
-This repository contains the source code for an intelligent email processing system that automates complaint classification and triage. Designed for service-oriented industries such as logistics and customer support, the system leverages Natural Language Processing (NLP) techniques, a lightweight architecture, and integration with Ollama's LLAMA 3 model to enhance operational efficiency.
 
-## Live Demo
-[![Watch the Demo](https://img.youtube.com/vi/66db5RdDg58/0.jpg)](https://www.youtube.com/watch?v=66db5RdDg58)
+Reads a support inbox, uses a local Llama 3.1 model to sort complaints into teams, and gives each team a Streamlit dashboard to reply from.
 
-Click the image above to watch the full demonstration on YouTube.
+<!-- TODO(demo): badges for CI and license once the workflow from task ticketing-003 is merged -->
+<!-- TODO(demo): docs/demo.gif (under 10 MB, about 800 px wide) recorded from the seeded database -->
 
----
+[![Watch the demo on YouTube](https://img.youtube.com/vi/66db5RdDg58/0.jpg)](https://www.youtube.com/watch?v=66db5RdDg58)
 
-## Key Features
+## Why it exists
 
-- Automated Email Parsing: Extract sender, subject, body, and timestamp.
-- Sentiment Analysis: Identify negative emails using rule-based detection and LLAMA 3-powered analysis.
-- Complaint Classification: Map issues to a predefined issue dictionary.
-- Team Assignment: Route tickets to the correct operational team.
-- Dashboard: View tickets by team, date, and sentiment.
-- Lightweight Backend: Local database for quick and easy deployment.
-- Integration with Ollama's LLAMA 3 for advanced text understanding and contextual analysis.
+Service teams in logistics and customer support get complaint emails that someone has to read, label and forward by hand. This project does the first pass locally: it flags negative mail, picks an issue category and a specific issue, and puts the ticket in front of the right team. No email text leaves your machine, because the model runs in Ollama.
 
----
+It was built as part of a research project for ICACECS 2025.
 
-## System Architecture
-![System Architecture](architecture.png)
+## Features
 
----
+- IMAP polling of a Gmail inbox for unread mail (`email_processor.py`, `check_email`), every 6 seconds.
+- Parsing of sender, subject and the first plain-text part; the body is stored truncated to 500 characters.
+- Sentiment check with a local Ollama model (`llama3.1`) through a LangChain prompt chain: positive mail needs no action.
+- Issue classification of negative mail into 1 of 10 categories and a specific issue (50 in total) from the built-in issue dictionary.
+- SQLite storage of every ticket: timestamp, sender, subject, body, sentiment, category, specific issue, status, reply (`db.py`).
+- Streamlit dashboard (`app.py`): totals, open tickets, category bar chart, sentiment chart, ticket volume over time, 10 most recent tickets.
+- One page per team with its open tickets; write a reply, send it by SMTP and close the ticket in one click. Closed tickets are listed with their replies.
 
-## Repository Structure
+## Architecture
+
+```mermaid
+flowchart LR
+    Gmail[Gmail inbox<br/>IMAP] -->|UNSEEN mail| EP[email_processor.py<br/>parse + classify]
+    EP -->|sentiment prompt| LLM[Ollama<br/>llama3.1]
+    EP -->|issue prompt, negative only| LLM
+    EP -->|INSERT| DB[(tickets.db<br/>SQLite)]
+    DBINIT[db.py<br/>creates table] --> DB
+    DB -->|SELECT| APP[app.py<br/>Streamlit dashboard]
+    APP -->|UPDATE status, reply| DB
+    APP -->|SMTP reply| Gmail
 ```
-📦 GenAI-Driven-Intelligent-Email-Ticketing
-├── app.py              # Dashboard for ticket view & team analytics
-├── db.py               # Backend for storing ticket metadata
-├── email_processor.py  # Core logic: parsing, sentiment, and classification
-├── sample_data/        # Sample dataset with 500 emails
-├── demo_video.mp4      # Video demonstration of the system (20 MB)
-├── requirements.txt    # Python dependencies
-└── README.md           # This documentation file
-```
 
----
+The original diagram is in `architecture.png`.
 
-## Setup Instructions
+## Tech stack
 
-### Clone the Repository
+Python, Streamlit, pandas, Plotly, streamlit-option-menu, SQLite, LangChain (`langchain_ollama`, `langchain_core`), Ollama with llama3.1, imaplib and smtplib from the standard library.
+
+## Quick start
+
+You need Python 3.10 or newer, [Ollama](https://ollama.com/), and a Gmail account with an app password if you want to read or send real mail.
+
 ```bash
 git clone https://github.com/Naresh23032003/GenAI-Driven-Intelligent-Email-Ticketing.git
-cd Naresh23032003/GenAI-Driven-Intelligent-Email-Ticketing
-```
-
-### Install Dependencies
-```bash
+cd GenAI-Driven-Intelligent-Email-Ticketing
 pip install -r requirements.txt
-```
-
-### Run the App
-```bash
+ollama pull llama3.1
+python db.py
 streamlit run app.py
 ```
 
-The dashboard will open in your default browser at `http://localhost:8501`.
+The dashboard opens at `http://localhost:8501`.
 
----
+<!-- TODO(demo): confirm these commands on a clean machine after tasks ticketing-001 and ticketing-002 are merged; today requirements.txt is missing plotly, streamlit-option-menu, langchain-ollama and langchain-core -->
 
-## How It Works
+To process live mail, set the variables below and run the poller in a second terminal:
 
-1. **Input**: Incoming emails are parsed to extract content and metadata.
-2. **Processing**: Sentiment is detected and categorized using keyword rules and LLAMA 3-based models.
-3. **Classification**: Negative sentiment emails are mapped to pre-defined issue labels.
-4. **Routing**: Each issue is linked to a responsible team (e.g., Logistics, Payment, Support).
-5. **Display**: A real-time dashboard displays complaints, statuses, and analytics.
-
----
-
-## Sample Data
-The `sample_data/` folder contains a dataset of 500 sample emails used to demonstrate system functionality. Use this data to test the system or as a reference format for integrating additional datasets.
-
----
-
-## Ollama - LLAMA 3 Integration
-This system integrates with [Ollama](https://ollama.com/) to utilize LLAMA 3 models for advanced text analysis and sentiment understanding. To use LLAMA 3 in the project:
-
-```python
-import ollama
-response = ollama.chat(model='llama3', messages=[{'role': 'user', 'content': 'Summarize this email: ...'}])
-print(response['message']['content'])
+```bash
+python email_processor.py
 ```
 
-Ensure that Ollama is running locally and the LLAMA 3 model is downloaded and ready.
+To try the dashboard without Gmail or Ollama, `sample_data/` holds a sample database.
+<!-- TODO(demo): verify what sample_data/ contains and how many emails (the old README says 500), then give the exact copy command; task ticketing-005 adds scripts/seed_demo.py -->
 
----
+## Configuration
+
+Set these environment variables (introduced by task ticketing-002; see `.env.example`):
+
+| Variable | Used by | Purpose |
+|---|---|---|
+| `EMAIL_ACCOUNT` | both | Gmail address |
+| `EMAIL_PASSWORD` | both | Gmail app password |
+| `IMAP_SERVER` | `email_processor.py` | IMAP host, default `imap.gmail.com` |
+| `DB_PATH` | both | SQLite file, default `tickets.db` |
+| `OLLAMA_MODEL` | `email_processor.py` | model name, default `llama3.1` |
+
+Never commit real credentials.
+
+## Tests
+
+<!-- TODO(demo): add the real command and result after tasks ticketing-001 and ticketing-003 -->
+Planned: `pytest` with a stubbed model, so tests need neither Ollama nor Gmail.
+
+## Project structure
+
+```
+app.py              Streamlit dashboard and SMTP reply
+db.py               creates the tickets table in SQLite
+email_processor.py  IMAP polling, parsing, LLM sentiment and issue classification
+sample_data/        sample data for the dashboard
+architecture.png    architecture diagram
+demo_video.mp4      recorded demonstration (about 20 MB)
+requirements.txt    Python dependencies
+```
+
+## Roadmap
+
+- Fix the classification fallback so unparseable model output becomes an "Uncategorized" ticket (task ticketing-001).
+- Environment-based configuration and a complete `requirements.txt` (task ticketing-002).
+- CI with lint and tests (task ticketing-003).
+- Dashboard fixes: visible send errors, daily ticket volume (task ticketing-004).
+- Split `email_processor.py` into parse, classify and store modules; Docker Compose with Ollama.
 
 ## License
-This project is licensed under the MIT License.
 
----
-
-## Acknowledgements
-Built as part of a research project for ICACECS 2025, this system integrates simple yet effective tools and advanced models to deliver measurable improvements in service efficiency.
-
----
+MIT. See `LICENSE`.
 
 ## Authors
-- Primary Developers & Researchers: Naresh R, Sreeja Sunkeswaram
 
-For questions or collaboration requests, please open an issue or contact us.
+Naresh R and Sreeja Sunkeswaram.
