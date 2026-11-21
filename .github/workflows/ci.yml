@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ "${{ matrix.python-version }}" = "3.12" ]; then
+            grep -E '^(langchain-core|langchain-ollama)' requirements.txt > /tmp/req.txt
+            echo "pandas>=2.0.0" >> /tmp/req.txt
+            echo "streamlit>=1.36.0" >> /tmp/req.txt
+            pip install -r /tmp/req.txt -r requirements-dev.txt
+          else
+            pip install -r requirements.txt -r requirements-dev.txt
+          fi
+
+      - name: Run Ruff
+        run: ruff check .
+
+      - name: Run Tests
+        run: pytest -q
