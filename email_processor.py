@@ -175,13 +175,13 @@ def extract_email_content(msg):
             if part.get_content_type() == "text/plain":
                 try:
                     body = part.get_payload(decode=True).decode(errors="ignore")
-                except:
+                except (AttributeError, UnicodeDecodeError):
                     pass
                 break
     else:
         try:
             body = msg.get_payload(decode=True).decode(errors="ignore")
-        except:
+        except (AttributeError, UnicodeDecodeError):
             pass
 
     return from_, subject, body

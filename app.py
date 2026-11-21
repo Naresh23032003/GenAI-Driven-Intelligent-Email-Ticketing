@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import sqlite3
-from datetime import datetime
 import smtplib
 from email.message import EmailMessage
 from streamlit_option_menu import option_menu
@@ -149,7 +148,7 @@ else:
                     update_ticket_status(row["id"], reply_text)
                     st.success("Ticket closed and email sent ✅")
                     st.experimental_rerun()
-                except Exception as e:
+                except Exception:
                     pass
 
     st.subheader("📁 Closed Tickets")
