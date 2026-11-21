@@ -1,6 +1,9 @@
+import os
 import sqlite3
 
-conn = sqlite3.connect("tickets.db")
+DB_PATH = os.environ.get("DB_PATH", "tickets.db")
+
+conn = sqlite3.connect(DB_PATH)
 cursor = conn.cursor()
 
 cursor.execute("""
