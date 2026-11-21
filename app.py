@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import sqlite3
@@ -10,9 +11,9 @@ import plotly.express as px
 # ------------------------
 # Configs
 # ------------------------
-EMAIL_ACCOUNT = "example@gmail.com"  # Replace with your email id
-EMAIL_PASSWORD = "password"          # Replace with your password
-DB_PATH = "tickets.db"
+EMAIL_ACCOUNT = os.environ.get("EMAIL_ACCOUNT", "")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
+DB_PATH = os.environ.get("DB_PATH", "tickets.db")
 
 # Updated customer issues dictionary (only used for sidebar navigation)
 customer_issues = {
@@ -148,9 +149,10 @@ else:
                     send_reply(row["sender"], row["subject"], reply_text)
                     update_ticket_status(row["id"], reply_text)
                     st.success("Ticket closed and email sent ✅")
-                    st.experimental_rerun()
                 except Exception as e:
-                    pass
+                    st.error(f"Failed to send reply or close ticket: {e}")
+                else:
+                    st.rerun()
 
     st.subheader("📁 Closed Tickets")
     closed_df = team_df[team_df["status"] == "closed"]
